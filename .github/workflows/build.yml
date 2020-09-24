@@ -5,7 +5,7 @@ jobs:
   build:
     name: Build
     runs-on: windows-latest
-    container: bdwyertech/win-python
+    # container: bdwyertech/win-python
     steps:
       - uses: actions/checkout@v2
 
@@ -16,5 +16,6 @@ jobs:
 
       - name: Build
         run: |
+          python -m pip install pipenv
           pipenv install -d
           pipenv run build
