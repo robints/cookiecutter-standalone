@@ -1,0 +1,20 @@
+name: Build
+on: [push]
+jobs:
+
+  build:
+    name: Build
+    runs-on: windows-latest
+    container: bdwyertech/win-python
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: actions/cache@v2
+        with:
+          path: |
+            .venv
+
+      - name: Build
+        run: |
+          pipenv install -d
+          pipenv run build
