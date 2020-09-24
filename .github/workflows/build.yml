@@ -13,6 +13,7 @@ jobs:
         with:
           path: |
             .venv
+        key: ${{ runner.os }}-${{ hashFiles('Pipfile*') }}
 
       - name: Build
         run: |
