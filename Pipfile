@@ -7,10 +7,10 @@ verify_ssl = true
 pyinstaller = "*"
 
 [packages]
-cookiecutter = "*"
+cookiecutter = {git = "https://github.com/bdwyertech/cookiecutter.git",ref = "bdwyertech",editable = true}
 
 [requires]
 python_version = "3.8"
 
 [scripts]
-build = "pyinstaller --name cookiecutter --onefile main.py --noupx --clean"
+build = "pyinstaller --name cookiecutter --onefile main.py --noupx --clean --hidden-import cookiecutter.extensions --hidden-import jinja2_time"
