@@ -7,6 +7,7 @@ verify_ssl = true
 pyinstaller = "*"
 macholib = {version = "*", sys_platform = "== 'darwin'"}
 pywin32-ctypes = {version = "*", sys_platform = "== 'win32'"}
+pefile = {version = "*", sys_platform = "== 'win32'"}
 
 [packages]
 cookiecutter = {git = "https://github.com/bdwyertech/cookiecutter.git",ref = "bdwyertech",editable = true}

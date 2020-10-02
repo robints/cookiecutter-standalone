@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "14060826d0a34081f60955dfb2788912e8d81690f593c2e881d235683468c9bd"
+            "sha256": "20750279f0baa702e49c6d7050837b379fe1e649562d1c407261c5d0d0ad0a09"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -190,6 +190,13 @@
             "index": "pypi",
             "markers": "sys_platform == 'darwin'",
             "version": "==1.14"
+        },
+        "pefile": {
+            "hashes": [
+                "sha256:a5d6e8305c6b210849b47a6174ddf9c452b2888340b8177874b862ba6c207645"
+            ],
+            "markers": "sys_platform == 'win32'",
+            "version": "==2019.4.18"
         },
         "pyinstaller": {
             "hashes": [
