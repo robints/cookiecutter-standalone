@@ -53,6 +53,7 @@ jobs:
   build-linux:
     name: Build - Linux
     runs-on: ubuntu-latest
+    container: python:3.8-alpine
     steps:
       - name: Checkout Code
         uses: actions/checkout@v2
