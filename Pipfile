@@ -5,6 +5,7 @@ verify_ssl = true
 
 [dev-packages]
 pyinstaller = "*"
+macholib = "*"
 
 [packages]
 cookiecutter = {git = "https://github.com/bdwyertech/cookiecutter.git",ref = "bdwyertech",editable = true}
