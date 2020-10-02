@@ -50,10 +50,37 @@ jobs:
         with:
           name: cookiecutter-osx
           path: dist/cookiecutter
+  build-linux:
+    name: Build - Linux
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+
+      - uses: actions/cache@v2
+        with:
+          path: |
+            .venv
+          key: ${{ runner.os }}-${{ hashFiles('Pipfile*') }}
+
+      - name: Build
+        run: |
+          python -m pip install pipenv
+          pipenv install -d
+          pipenv run build
+
+      - name: Upload Standalone Binary
+        uses: actions/upload-artifact@v2
+        with:
+          name: cookiecutter-linux
+          path: dist/cookiecutter
 
   release:
     name: Release
-    needs: build-win
+    needs:
+      - build-win
+      - build-osx
+      - build-linux
     runs-on: ubuntu-latest
     if: startsWith(github.ref, 'refs/tags/')
     # container: bdwyertech/win-python
