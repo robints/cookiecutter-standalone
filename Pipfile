@@ -5,15 +5,17 @@ verify_ssl = true
 
 [dev-packages]
 pyinstaller = "*"
+typing_extensions = "*"
+altgraph = "*"
 macholib = {version = "*", sys_platform = "== 'darwin'"}
 pywin32-ctypes = {version = "*", sys_platform = "== 'win32'"}
 pefile = {version = "*", sys_platform = "== 'win32'"}
 
 [packages]
-cookiecutter = {git = "https://github.com/bdwyertech/cookiecutter.git",ref = "bdwyertech",editable = true}
+cookiecutter = {git = "https://github.com/cookiecutter/cookiecutter.git", ref = "2.6.0", editable = false}
 
 [requires]
-python_version = "3.8"
+python_version = "3.11"
 
 [scripts]
-build = "pyinstaller --name cookiecutter --onefile main.py --noupx --clean --hidden-import cookiecutter.extensions --hidden-import jinja2_time"
+build = "pyinstaller --name cookiecutter --onefile main.py --noupx --clean --hidden-import cookiecutter.extensions --hidden-import jinja2_time --add-data 'VERSION.txt:cookiecutter'"
