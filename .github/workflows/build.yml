@@ -1,13 +1,31 @@
 name: Build
 on: [push]
 jobs:
-  build-win:
-    name: Build - Windows
-    runs-on: windows-latest
-    # container: bdwyertech/win-python
+  build:
+    strategy:
+      matrix:
+        os: [macos-latest,ubuntu-latest,windows-latest]
+        include:
+          - os: macos-latest
+            python-version: 3.11
+            artifact: cookiecutter-darwin
+            dist: dist/cookiecutter
+          - os: ubuntu-latest
+            python-version: 3.11
+            artifact: cookiecutter-linux
+            dist: dist/cookiecutter
+          - os: windows-latest
+            python-version: 3.11
+            artifact: cookiecutter-win
+            dist: dist/cookiecutter.exe
+    runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout Code
         uses: actions/checkout@v2
+
+      - uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
 
       - uses: actions/cache@v2
         with:
@@ -15,81 +33,35 @@ jobs:
             .venv
           key: ${{ runner.os }}-${{ hashFiles('Pipfile*') }}
 
-      - name: Build
+      - name: Install dependencies
         run: |
           python -m pip install pipenv
           pipenv install -d
-          pipenv run build
+          pipenv run pip install altgraph
+
+      - name: Build
+        run: pipenv run build
 
       - name: Upload Standalone Binary
         uses: actions/upload-artifact@v2
         with:
-          name: cookiecutter.exe
-          path: dist/cookiecutter.exe
-  build-osx:
-    name: Build - OSX
-    runs-on: macos-latest
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v2
-
-      - uses: actions/cache@v2
-        with:
-          path: |
-            .venv
-          key: ${{ runner.os }}-${{ hashFiles('Pipfile*') }}
-
-      - name: Build
-        run: |
-          python -m pip install pipenv
-          pipenv install -d
-          pipenv run build
-
-      - name: Upload Standalone Binary
-        uses: actions/upload-artifact@v2
-        with:
-          name: cookiecutter-osx
-          path: dist/cookiecutter
-  build-linux:
-    name: Build - Linux
-    runs-on: ubuntu-latest
-    container: python:3.8
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v2
-
-      - uses: actions/cache@v2
-        with:
-          path: |
-            .venv
-          key: ${{ runner.os }}-${{ hashFiles('Pipfile*') }}
-
-      - name: Build
-        run: |
-          python -m pip install pipenv
-          pipenv install -d
-          pipenv run build
-
-      - name: Upload Standalone Binary
-        uses: actions/upload-artifact@v2
-        with:
-          name: cookiecutter-linux
-          path: dist/cookiecutter
+          name: ${{ matrix.artifact }}
+          path: ${{ matrix.dist }}
 
   release:
     name: Release
-    needs:
-      - build-win
-      - build-osx
-      - build-linux
+    needs: build
     runs-on: ubuntu-latest
     if: startsWith(github.ref, 'refs/tags/')
-    # container: bdwyertech/win-python
     steps:
-      - name: Download Standalone Binary
+      - name: Checkout Code
+        uses: actions/checkout@v2
+
+      - name: Download Artifacts
         uses: actions/download-artifact@v2
         with:
-          name: cookiecutter.exe
+          path: dist
+
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
@@ -100,13 +72,36 @@ jobs:
           release_name: Release ${{ github.ref }}
           draft: false
           prerelease: false
-      - name: Upload Release Asset
-        id: upload-release-asset
+
+      - name: Upload Release Asset MacOS Darwin
+        id: upload-release-asset-macos-darwin
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
-          asset_path: cookiecutter.exe
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: dist/cookiecutter-darwin/cookiecutter
+          asset_name: cookiecutter-darwin
+          asset_content_type: application/octet-stream
+
+      - name: Upload Release Asset Linux
+        id: upload-release-asset-linux
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: dist/cookiecutter-linux/cookiecutter
+          asset_name: cookiecutter-linux
+          asset_content_type: application/octet-stream
+
+      - name: Upload Release Asset Windows
+        id: upload-release-asset-windows
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: dist/cookiecutter-win/cookiecutter.exe
           asset_name: cookiecutter.exe
-          asset_content_type: application/x-msdownload
+          asset_content_type: application/octet-stream
